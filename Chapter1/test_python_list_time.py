@@ -41,7 +41,7 @@ def test4(n):
 	
 
 if __name__ == "__main__":
-	test1(1)
-	test2(1)
-	test3(1)
-	test4(1)
+	test1(10)
+	test2(10)
+	test3(10)
+	test4(10)
