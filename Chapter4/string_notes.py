@@ -82,7 +82,38 @@
 			
 		KMP算法：
 			提前记录字符串的匹配信息 -- 静态预处理
+	
+	字符串匹配问题：
+		模式：
+			模式的形式是什么；
+			描述的字符串集合如何确定
+			怎样做匹配
 			
+		模式语言 -- 正则表达式（regex）
+		
+	
+	正则表达式：
+		原始字符串：在不同字符串前加r或R前缀，反斜杠不作为转义字符
+		
+	python中re模块的使用：
+		re.compile(pattern, flag=0)  -- 生成匹配模式  -- 当一个模式匹配使用的次数多时，则如此操作
+		
+		re.search(patter, string, flag=0) -- 从任意位置开始匹配，值匹配一次）
+		
+		re.match(patter, string, flag=0) -- 从头开始匹配，从头开始匹配，仅匹配一次
+		
+		re.split(pattern, string, maxsplit=(), flags=()) -- 分割字符串，maxsplit最大分割数
+		
+		re.findall(pattern, string, flags=0) -- 返回一个列表，匹配所有
+		
+		[\t \v\n\f\r] -- 空白字符
+		
+		"\^","\-","\]"
+		
+		
+		
+		
+		
 		
 			
 		
