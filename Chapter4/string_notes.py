@@ -97,6 +97,7 @@
 		
 	python中re模块的使用：
 		re.compile(pattern, flag=0)  -- 生成匹配模式  -- 当一个模式匹配使用的次数多时，则如此操作
+		# 直接生成一个正则表达式对象
 		
 		re.search(patter, string, flag=0) -- 从任意位置开始匹配，值匹配一次）
 		
@@ -109,12 +110,45 @@
 		[\t \v\n\f\r] -- 空白字符
 		
 		"\^","\-","\]"
+	
+	模式串中：
+		圆括号 -- 表示组
+		圆点 .   -- 表示任意字符
 		
+	使用括号来确定作用空间
+	
+	python中将'-'看作运算符，非0整数不以0开头
+	
+	行首描述符，是与每一行的行首匹配，不一定只针对字符串行首
+	
+	使用r不转义
+	
+	当匹配失败时，会返回None
 		
-		
-		
-		
-		
-			
-		
+	mat.group()		# 获取匹配到的字符串
+	mat.strat()		# 获取取匹配到的字符串的起始索引位置
+	mat.end()
+	
+	mat.span()		# 字符串位置区间
+	
+	mat.re		# 查看匹配规则
+	mat.string		# 查看被匹配的字符串
+	
+	通过mat.group(n) 	# 获取相应的组元素，通过括号设定相应的组范围
+	
+	同时，通过在模式串中使用 '\n' 表示第n个匹配的串；但要注意格式的
+	
+	re.sub(pattern, repl, string, count=0, flags=0)
+	
+	
+	### TODO ###
+		--str
+			--package1
+				--program1.py 
+				# 从program1中调用program2
+				# 这时，会显示program2中的 from program3 import ... 出现错误
+				# 表示未找到相应的module
+			--package2
+				--program2.py # 在program2中调用了program3(from program3 import ..)
+				--program3.py	
 """
