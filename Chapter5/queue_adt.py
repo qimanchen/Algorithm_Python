@@ -40,7 +40,7 @@ class Queue(object):
 
 # list实现队列
 class SQueue(object):
-	"""对列实现数据结构"""
+	"""队列实现数据结构"""
 	
 	def __init__(self, init_len=8):		# 默认队列初始长度为8
 		"""创建空队列"""
