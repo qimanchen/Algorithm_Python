@@ -35,7 +35,10 @@ class PrioQueueError(ValueError):
 	
 
 class PrioQue(object):
-	"""优先队列类"""
+	"""
+		list实现
+		优先队列类
+	"""
 	
 	def __init__(self, elist=[]):
 		# 对实参表做拷贝，避免共享
@@ -156,7 +159,6 @@ class PrioQueue(object):
 		""" 空list，not [] 返回True"""
 		return not self._elems
 	
-	# 取优先
 	def peek(self):
 		if self.is_empty():
 			raise PrioQueueError(" in peek ")
@@ -201,7 +203,8 @@ class PrioQueue(object):
 			elems[i] = elems[j]		# elems[j] 在三者中最小，上移
 			i, j = j, 2*j + 1
 		elems[i] = e
-			
+	
+	# 将list转换成堆（满足堆定义的完全二叉树）
 	def buildheap(self):
 		"""创建操作的复杂度是O(n)"""
 		end = len(self._elems)

@@ -43,7 +43,7 @@ class SQueue(object):
 		"""将元素elem加入队列 -- 入队"""
 		if self._num == self._len:
 			self.__extend()
-		self._elems[(self._head+self._num)%self._len] = e
+		self._elems[(self._head+self._num)%self._len] = elem
 		self._num += 1
 		
 	def __extend(self):
@@ -73,7 +73,13 @@ class SQueue(object):
 
 
 class Simulation(object):
-	
+	"""
+	总结：
+		Simulation类和下面的Event类实现一个支持离散事件模拟的通用框架
+		实际事件类的run方法，通过生成新事件完成模拟过程的实际控制
+		Customs类实现检查站模拟系统的基础支撑功能和主控函数
+		存在一个队列作为缓冲，保存已经到来但还不能检查的车辆
+	"""
 	def __init__(self, duration):
 		self._eventq = PrioQueue()		# 使用优先队列记录模拟中缓存的事件，事件队列
 		self._time = 0		# 记录当前时间
@@ -181,7 +187,7 @@ class Customs(object):
 		# 将新等待车辆加入到等待队列中
 		self.waitline.enqueue(car)
 		
-	def has_queued_cat(self):
+	def has_queued_car(self):
 		# 判断是否有车辆在等待排队
 		return not self.waitline.is_empty()
 		
@@ -268,4 +274,55 @@ class Arrive(Event):
 	def run(self):
 		time, customs = self.time(), self.host()
 		event_log(time, "car arrive")
-		# 生成
+		# 生成下一个Arrive事件
+		# *customs -- 迭代参数传递
+		Arrive(time+randint(*customs.arrive_interval), customs)
+		
+		# 定义车辆事件的行为
+		car = Car(time)
+		if customs.has_queued_car():		# 有车辆在等，进入等待队列
+			customs.enqueue(car)
+			return
+		i = customs.find_gate()			# 检查空闲通道
+		if i is not None:		# 有通道，进入检查
+			event_log(time, "car check")
+			# 如果有车离开
+			Leave(time + randint(*customs.check_interval), i, car, customs)
+		else:
+			customs.enqueue(car)
+			
+
+class Leave(Event):
+	"""车离开事件类"""
+	
+	def __init__(self, leave_time, gate_num, car, customs):
+		Event.__init__(self, leave_time, customs)
+		self.car = car
+		self.gate_num = gate_num
+		customs.add_event(self)
+		
+	def run(self):
+		time, customs = self.time(), self.host()
+		event_log(time, "car leave")
+		customs.free_gate(self.gate_num)
+		customs.car_count_1()
+		customs.total_time_acc(time - self.car.arrive_time())
+		if customs.has_queued_car():
+			# 进行下一辆车的处理
+			car = customs.next_car()
+			i = customs.find_gate()
+			event_log(time,"car check")
+			customs.wait_time_acc(time - car.arrive_time())
+			Leave(time + randint(*customs.check_interval), self.gate_num, car, customs)
+			
+
+def test():
+	car_arrive_interval = (1, 2)
+	car_check_time = (3, 5)
+	cus = Customs(3, 480, car_arrive_interval, car_check_time)
+	cus.simulate()
+	
+	
+if __name__ == "__main__":
+	test()
+		

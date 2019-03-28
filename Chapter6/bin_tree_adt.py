@@ -2,6 +2,54 @@
 # -*- coding: utf-8 -*-
 
 
+from discrete_event_system import SQueue
+
+class StackUnderflow(ValueError):
+	""" 栈下溢 -- 空栈访问"""
+	pass
+	
+	
+class LNode(object):
+	
+	def __init__(self, elem, next_=None):
+		self.elem = elem
+		self.next = next_
+
+class SStack(object):
+	"""
+		栈的ADT
+		基于顺序表实现栈类
+	"""
+	
+	def __init__(self):
+		"""
+			创建空栈
+			使用list对象 _elems存储栈中元素
+			所有的栈操作都映射到list操作
+		"""
+		self._elems = []
+		
+	def is_empty(self):
+		"""判断栈是否未空，空时返回True，否则返回False"""
+		return self._elems == []
+		
+	def push(self, elem):
+		"""将elem加入栈 -- 压栈，入栈"""
+		self._elems.append(elem)
+		
+	def pop(self):
+		"""删除栈中最后压入的元素，出栈"""
+		if self._elems == []:
+			raise StackUnderflow("in SStack.pop() ")
+		return self._elems.pop()
+		
+	def top(self):
+		"""取得栈内最后压入的元素，但不删除"""
+		if self._elems == []:
+			raise StackUnderflow("in SStack.top()")
+		return self._elems[-1]
+
+
 class BinTree(object):
 	"""
 		二叉树实现数据结构
@@ -133,20 +181,18 @@ def is_basic_exp(a):
 	
 def is_number(x):
 	"""判断是否是数值（int，float，complex）"""
-	return (isinstance(x, int) or isinstance(x, float) or isinstance(x, complex)
+	return (isinstance(x, int) or isinstance(x, float) or isinstance(x, complex))
 	
-e1 = make_prod(3, make_sum(2, 5))
+# e = make_prod(3, make_sum(2, 5))
 
 # make_sum(make_prod('a', 2), make_prod('b', 7))
 
-"""数学表达式求值规则：
-	1、对表达式里的数，其值就是它们本身
-	2、其它表达式根据运算符的情况处理，可以定义专门的处理函数
-	3、当一个运算符的两个运算对象都是数时，就可以求出一个数值
-"""
-
-# 求值函数
+# 数学表达式求值规则：
+# 1、对表达式里的数，其值就是它们本身
+# 2、其它表达式根据运算符的情况处理，可以定义专门的处理函数
+# 3、当一个运算符的两个运算对象都是数时，就可以求出一个数值
 def eval_exp(e):
+	# 求值函数
 	if is_basic_exp(e):
 		return e
 	# 通过本函数的递归调用，处理子树的运算
@@ -183,6 +229,205 @@ def eval_div(a, b):
 	if is_number(b) and b == 0:
 		raise ZeroDivisionError
 	return make_div(a, b)
+
+	
+"""
+	二叉树的实现方案:
+		1、通过前面实现的list和tuple技术，以其作为二叉树类型内部表示方式
+		2、链接实现：
+			用一个数据单元表示一个二叉树的结点，通过子结点链接（指针）建立结点之间的联系
+"""
+
+
+class BinTNode(object):
+	"""
+		二叉树结点类
+		没有子结点用None表示
+		空二叉树直接用None表示
+	"""
+	
+	def __init__(self, dat, left=None, right=None):
+		self.data = dat		# 结点数据
+		self.left = left		# 左结点
+		self.right = right	# 右结点
+
+"""
+	1、描述空树处理，直接给出结果
+	2、描述非空树处理：
+		a、如何处理根结点
+		b、通过递归调用分别处理左右子树
+		c、基于上述三部分处理的结果得到整个树的处理结果
+
+"""
+# 统计树中结点个数
+def count_BinTNodes(t):
+	if t is None:
+		return 0
+	else:
+		return 1 + count_BinTNodes(t.left) + count_BinTNodes(t.right)
+
+# 如果结点中保存数值，求二叉树中所有数值和:
+def sum_BinTNodes(t):
+	if t is None:
+		return 0
+	else:
+		return t.data + sum_BinTNodes(t.left) + count_BinTNodes(t.right)
+
+# 实现二叉树遍历及做出相关操作
+# 广度优先		
+def preorder(t, proc):
+	"""
+		二叉树的递归遍历实现
+		proc是具体结点数据的操作
+	"""
+	
+	if t is None:
+		return		
+	proc(t.data)
+	preorder(t.left)
+	preorder(t.right)
+	
+# 输出二叉树
+def print_BinTNodes(t):
+	if t is None:
+		print("^", end=" ")		# 空树输出 ^
+		return
+	print("(" + str(t.data), end=" ")
+	print_BinTNodes(t.left)
+	print_BinTNodes(t.right)
+	print(")", end=" ")
+		
+
+# 深度优先实现
+def levelorder(t, proc=None):
+	# 建立缓存处理队列
+	qu = SQueue()
+	qu.enqueue(t)
+	while not qu.is_empty():
+		t = qu.dequeue()
+		if t is None:		# 弹出的树为空则直接跳过
+			continue
+		# 判空操作
+		# 根 -- 左 -- 右
+		if not t.left is None:
+			qu.enqueue(t.left)
+		if not t.right is None:
+			qu.enqueue(t.right)
+		proc(t.data)
+# 不能直接通过迭代修改为生成器
+# 由于每次迭代返回的都是None
+
+# 非递归的先根序遍历函数
+"""
+	非递归遍历：
+		1、递归与非递归的关系
+		2、清楚二叉树遍历的具体过程和相关性质
+		3、分析问题和设计算法
+		
+	实现：
+		先根序， 遇到结点就访问，下一步沿着树的左支下行
+		结点的右分支入栈
+		遇空树回溯，取出栈中保存的一个右分支，像二叉树一样遍历它
+	
+	循环不变关系：
+		只要前树不为空或栈不为空
+		
+		内部遇到空树就回溯
+"""
+def preorder_nonrec_root(t, proc):
+	# 先根序
+	s = SStack()		# 建立栈
+	while t is not None or not s.is_empty():
+		while t is not None:		# 回溯条件
+			proc(t.data)		# 先根序先处理根数据
+			s.push(t.right)	# 右分支入栈
+			t = t.left		# 沿左分支下行
+		t = s.pop()		# 遇到空树，回溯
+
+def preorder_nonrec_mid(t, proc):
+	""" 
+		中根序
+		
+		分析：
+			左 -- 根 -- 右
+			先查看左结点是否为空，不为空则
+			查看其左结点的左结点是否为空：
+			若为空，则 proc(t.left.data), proc(t.data)
+			s.push(t.right)
+			若不为空:
+				s.push(t)
+				t = t.left
+			若为空，proc(t.data)
+			同时检测t.right是否为空，若不为空
+				s.push(t.right)
+			若为空 continue
+
+	"""
+	s = SStack()
+	while t is not None or not s.is_empty():
+		while t is not None:
+			if t.left is None and t.right is not None:
+				proc(t.data)
+				t = t.right
+			elif t.left is None and t.right is None:
+				proc(t.data)
+				break
+			else:
+				s.push(t)
+				t = t.left
+		if s.is_empty():
+			break
+		
+		t = s.pop()
+		proc(t.data)	# 根结点处理
+		if t.right is not None:
+			t = t.right
+
+def preorder_nonrec_last(t, proc):
+	"""
+		函数定义中的下行循环 -- 内层循环
+		
+	"""
+	s = SStack()
+	while t is not None or not s.is_empty():
+		while t is not None:		# 下行循环，指导栈顶的两子树为空
+			s.push(t)
+			t = t.left if t.left is not None else t.right
+			
+		t = s.pop()		# 栈顶就是应该访问的结点
+		proc(t.data)
+		
+		if not s.is_empty() and s.top().left == t:
+			t = s.top().right
+		else:
+			t = None
+	
+# 通过生成器函数遍历
+# 非递归算法，实现迭代器的基础
+def preorder_elements(t):
+	s = SStack()
+	while t is not None or not s.is_empty():
+		while t is not None:
+			s.push(t.right)
+			yield t.data
+			t = t.left
+		t = s.pop()
+
+# test函数	
+def test():
+	a = BinTNode('A', BinTNode('B', BinTNode('D', None, BinTNode('H')), BinTNode('E', None, BinTNode('I'))), BinTNode('C', BinTNode('F', BinTNode('J'), BinTNode('K')), BinTNode('G')))
+	levelorder(a, print)
+	print_BinTNodes(a)
+	print()
+	preorder_nonrec_root(a, lambda x: print(x, end=" "))
+	print()
+	preorder_nonrec_last(a, lambda x: print(x, end=" "))
+	print()
+	preorder_nonrec_mid(a, lambda x: print(x, end=" "))
+
+if __name__ == "__main__":
+	test()
+		
 	
 
 
