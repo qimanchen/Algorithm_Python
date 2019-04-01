@@ -412,7 +412,143 @@ def preorder_elements(t):
 			yield t.data
 			t = t.left
 		t = s.pop()
+		
+		
+# 二叉树类
+class BinTree(object):
+	"""
+		二叉树类：
+			为解决基于结点构造的二叉树的None非BinTNode类型
+			同样为保持好二叉树解决方法的封装性
+	"""
+	
+	def __init__(self):
+		# 空树
+		self._root = None
+		
+	def is_empty(self):
+		"""判空"""
+		return self._root is None
+		
+	def root(self):
+		# 查询根结点
+		return self._root
+	
+	def leftchild(self):
+		"""
+			查询左结点
+		"""
+		return self._root.left
+		
+	def rightchild(self):
+		"""
+			查询右结点
+		"""
+		return self._root.right
+		
+	def set_root(self, rootnode):
+		"""
+			操作根结点
+		"""
+		self._root = rootnode
+		
+	def set_left(self, leftchild):
+		"""
+			操作左结点
+		"""
+		self._root.left = leftchild
+		
+	def set_right(self, rightchild):
+		"""
+			操作右结点
+		"""
+		self._root.right = rightchild
+		
+	def preorder_elements(self):
+		"""
+			元素迭代器
+			先根序实现类
+		"""
+		t, s = self._root, SStack()
+		while t is not None or not s.is_empty():
+			while t is not None:
+				s.push(t.right)
+				yield t.data
+				t = t.left
+			t = s.pop()
 
+			
+class BinPNode(object):
+	""" 
+		可查询结点的结点类
+	"""
+	def __init__(self, dat, parent=None, left=None, right=None):
+		self.data = dat
+		self.parent = parent
+		self.left = left
+		self.right = right
+			
+class BinTreeParent(object):
+	"""
+		增加结点的父结点域
+		方便父结点的查询
+	"""
+	def __init__(self):
+		# 空树
+		self._root = None
+		
+	def is_empty(self):
+		"""判空"""
+		return self._root is None
+		
+	def root(self):
+		# 查询根结点
+		return self._root
+	
+	def leftchild(self):
+		"""
+			查询左结点
+		"""
+		return self._root.left
+		
+	def rightchild(self):
+		"""
+			查询右结点
+		"""
+		return self._root.right
+		
+	def set_root(self, rootnode):
+		"""
+			操作根结点
+		"""
+		self._root = BinPNode(rootnode)
+		
+	def set_left(self, leftchild):
+		"""
+			操作左结点
+		"""
+		self._root.left = BinPNode(leftchild, self._root)
+		
+	def set_right(self, rightchild):
+		"""
+			操作右结点
+		"""
+		self._root.right = BinPNode(rightchild, self._root)
+		
+	def preorder_elements(self):
+		"""
+			元素迭代器
+			先根序实现类
+		"""
+		t, s = self.root(), SStack()
+		while t is not None or not s.is_empty():
+			while t is not None:
+				s.push(t.right)
+				yield t.data
+				t = t.left
+			t = s.pop()
+			
+		
 # test函数	
 def test():
 	a = BinTNode('A', BinTNode('B', BinTNode('D', None, BinTNode('H')), BinTNode('E', None, BinTNode('I'))), BinTNode('C', BinTNode('F', BinTNode('J'), BinTNode('K')), BinTNode('G')))
@@ -424,9 +560,22 @@ def test():
 	preorder_nonrec_last(a, lambda x: print(x, end=" "))
 	print()
 	preorder_nonrec_mid(a, lambda x: print(x, end=" "))
+	
+def test_BinTreeParent():
+	"""
+		测试BinTreeParent类
+	"""
+	ptree = BinTreeParent()
+	ptree.set_root(10)
+	ptree.set_right(20)
+	ptree.set_left(20)
+	
+	print(ptree.root().data, ptree.leftchild().data, ptree.rightchild().data)
+	for i in ptree.preorder_elements():
+		print(i)
 
 if __name__ == "__main__":
-	test()
+	test_BinTreeParent()
 		
 	
 
