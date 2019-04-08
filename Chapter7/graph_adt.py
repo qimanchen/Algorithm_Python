@@ -198,7 +198,7 @@ class GraphAL(Graph):
 		"""
 			增加一个新的顶点到图中
 		"""
-		self._mat.apped([])
+		self._mat.append([])
 		self._vnum += 1
 		return self._vnum - 1
 		
