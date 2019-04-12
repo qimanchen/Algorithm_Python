@@ -3,7 +3,7 @@
 
 # 记录结构
 class Record(object):
-	""" """
+	""" 排序数据 """
 	
 	def __init__(self, key, datum):
 		self.key = key
@@ -266,6 +266,9 @@ def quick_sort_1(lst):
 def merge(lfrom, lto, low, mid, high):
 	"""
 		两分段归并操作
+		low: 分段的最低为
+		mid：第二分段的起点
+		high：第二分段的终点
 	"""
 	i, j, k = low, m, low
 	
@@ -312,8 +315,83 @@ def merge_sort(lst):
 	templst = [None]*llen
 	
 	while slen < llen:
+		# 两list之间切换
 		merge_pass(lst, templst, llen, slen)
 		slen *= 2
 		merge_pass(templst, lst, llen, slen)			# 结果放回原位
 		slen *= 2
 		
+# 其他排序算法
+"""
+	分配排序和基数排序：
+		关键码只有几个很少不同值：
+			1、为每个关键码设置一个桶
+			2、排序时简单的根据关键码把记录放入相应桶中
+			3、存入所有记录，顺序收集各个桶中的数据，得到相应的排序序列
+			
+	多轮分配和排序：
+		扩充分配排序的应用范围：
+			采用元素适合分配排序的元组作为关键码：
+				以元素组作为基准，再进行分配排序
+				
+			高位优先：
+				1、先对元组中的高位进行相应的分配
+				2、在对各子序列进行排序，直到所有的子序列排序完毕
+				
+				缺点：
+					需要考虑越来越多的子序列
+			低位优先：
+				1、先按元组中最后一位进行排序分类
+				2、再按照关键码中间元素分配和收集
+				3、再对高位进行一次分配和收集
+				
+	排序过程就是从低位到高位逐步进行分配和收集  -- 按基数逐位处理 -- 基数排序
+	
+	实现：
+		1、需要排序是Record类型的顺序表
+		2、记录中的关键码是十进制数字的元组，包含r个元素
+		3、排序算法的参数是表lst和关键码元组长度r
+		
+		算法需要记录一组记录桶，而且需要稳定的分配和收集
+		用10个list作为记录桶
+				
+"""
+
+def radix_sort(lst, d):
+	""" 多轮排序 -- 基数排序 """
+	rlists = [[] for i in range(10)]		# 初始化10个记录桶
+	llen = len(lst)		# 操作list的数据量
+	
+	# 从最地位开始
+	for m in range(-1, -d-1, -1):
+		for j in range(llen):
+			rlists[lst[j].key[m]].append(lst[j])
+			
+		j = 0
+		for i in range(10):
+			tmp = rlists[i]
+			for k in range(len(tmp)):
+				lst[j] = tmp[k]
+				j += 1
+			rlists[i].clear()
+			
+# 混成法
+# 稳定性的考虑
+"""
+	当关键码相同时：
+		(key, i)作为关键码
+		增加空间消耗
+"""
+
+"""
+python中的list排序：
+	混成排序算法：
+		Timsort
+		
+	基于归并和插入
+	1、考察待排序序列中非严格单调上升或严格单调下降
+	2、采用插入排序，对连续出现的几个特别短的上升序列排序，使得整个序列变成一序列
+	3、通过归并产生更长的排序片段
+"""
+			
+	
